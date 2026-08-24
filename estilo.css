@@ -1,0 +1,487 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+
+body {
+    background-color: #0A2342;
+    color: #FFFFFF;
+    line-height: 1.6;
+}
+
+
+header {
+    background-color: #0A2342;
+    border-bottom: 3px solid #DC2626;
+    padding: 1rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+}
+
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+
+nav a {
+    color: #FFFFFF;
+    text-decoration: none;
+    margin-left: 2rem;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+
+nav a:hover {
+    color: #93C5FD;
+}
+
+
+.menu-btn {
+    display: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #FFFFFF;
+}
+
+
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: linear-gradient(rgba(10, 35, 66, 0.85), rgba(10, 35, 66, 0.85)), 
+              url('https://i.pinimg.com/736x/39/9e/fc/399efc5b615a7742d2151adbafa24ea6.jpg') center/cover no-repeat;
+  padding-top: 60px;
+}
+
+
+.hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    color: #FFFFFF;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+}
+
+
+.hero p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    max-width: 800px;
+}
+
+
+.btn {
+    padding: 1rem 2.5rem;
+    background-color: #1E40AF;
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: background-color 0.3s, transform 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+
+.btn:hover {
+    background-color: #2563EB;
+    transform: translateY(-2px);
+}
+
+
+section {
+    padding: 5rem 5%;
+    background-color: #0A2342;
+}
+
+
+h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #FFFFFF;
+    position: relative;
+}
+
+h2::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 3px;
+    background-color: #DC2626;
+    margin: 0.8rem auto 0 auto;
+}
+
+
+.servicos-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+
+.servico-card {
+    background-color: #1E3A8A;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+
+.servico-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+
+.servico-card h3 {
+    color: #BFDBFE;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+}
+
+
+.sobre p {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+
+.contato {
+    background-color: #0A2342;
+}
+
+
+.contato-info {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+
+.contato-info p {
+    margin: 1rem 0;
+}
+
+
+/* PÁGINAS */
+.pagina {
+    display: none;
+}
+
+
+.pagina.visivel {
+    display: block;
+}
+
+
+.agendamento {
+    min-height: 100vh;
+    padding-top: 120px;
+    padding-bottom: 5rem;
+    background-color: #0A2342;
+}
+
+
+.agendamento-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background-color: #1E3A8A;
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+
+.agendamento-container h2 {
+    margin-top: 0;
+}
+
+
+.agendamento-desc {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    color: #DBEAFE;
+}
+
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #BFDBFE;
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #172554;
+    color: #FFFFFF;
+    font-size: 1rem;
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: 2px solid #3B82F6;
+}
+
+
+.info-importante {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #1E3A8A;
+    border-left: 4px solid #DC2626;
+    border-radius: 6px;
+}
+
+
+.info-importante h3 {
+    color: #BFDBFE;
+    margin-bottom: 1rem;
+}
+
+
+.info-importante ul {
+    list-style-position: inside;
+    color: #DBEAFE;
+}
+
+
+.info-importante li {
+    margin: 0.5rem 0;
+}
+
+
+.btn-voltar {
+    background: transparent;
+    color: #93C5FD;
+    border: 2px solid #93C5FD;
+    margin-top: 1rem;
+}
+
+
+.btn-voltar:hover {
+    background-color: #1E40AF;
+    color: #FFFFFF;
+    border-color: #1E40AF;
+}
+
+
+.botoes-form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+
+footer {
+    background-color: #0A2342;
+    border-top: 3px solid #DC2626;
+    text-align: center;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+
+/* ✅ PÁGINA DE CONFIRMAÇÃO */
+.confirmacao {
+    min-height: 100vh;
+    padding-top: 120px;
+    padding-bottom: 5rem;
+    display: flex;
+    align-items: center;
+    background-color: #0A2342;
+}
+
+
+.confirmacao-container {
+    max-width: 650px;
+    margin: 0 auto;
+    background-color: #1E3A8A;
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+
+.icone-sucesso {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+
+.confirmacao-container h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 2.2rem;
+}
+
+
+.confirmacao-desc {
+    font-size: 1.1rem;
+    color: #DBEAFE;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+}
+
+
+.resumo-agendamento {
+    background-color: #172554;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+
+.resumo-agendamento h3 {
+    color: #BFDBFE;
+    margin-bottom: 1.2rem;
+    text-align: center;
+}
+
+
+.resumo-agendamento ul {
+    list-style: none;
+}
+
+
+.resumo-agendamento li {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #334155;
+    font-size: 1.05rem;
+}
+
+
+.resumo-agendamento li:last-child {
+    border-bottom: none;
+}
+
+
+.resumo-agendamento strong {
+    color: #BFDBFE;
+}
+
+
+.aviso-confirmacao {
+    padding: 1.2rem;
+    background-color: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    color: #E2E8F0;
+}
+
+
+#aviso-horario {
+    color: #FCA5A5;
+}
+
+
+@media (max-width: 768px) {
+    .menu-btn {
+        display: block;
+    }
+
+
+    nav {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background-color: #0A2342;
+        display: none;
+        flex-direction: column;
+        padding: 1rem 0;
+    }
+
+
+    nav.ativo {
+        display: flex;
+    }
+
+
+    nav a {
+        margin: 1rem 0;
+        text-align: center;
+    }
+
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+
+    .hero p {
+        font-size: 1.2rem;
+    }
+
+
+    .agendamento-container,
+    .confirmacao-container {
+        padding: 1.5rem;
+        margin: 0 1rem;
+    }
+
+
+    .resumo-agendamento {
+        padding: 1.2rem;
+    }
+}
+/* ✅ ÍCONE FLUTUANTE DO WHATSAPP */
+.whatsapp-flutuante {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background-color: #25D366;
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 9999;
+  transition: transform 0.3s ease;
+}
+
+
+.whatsapp-flutuante:hover {
+  transform: scale(1.15);
+  background-color: #128C7E;
+}
