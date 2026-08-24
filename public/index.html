@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barbearia Estilo</title>
-    <!-- Ligação com o CSS -->
     <link rel="stylesheet" href="estilo.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
     <header>
         <div class="logo">BARBEARIA ESTILO</div>
@@ -19,7 +21,6 @@
         </nav>
     </header>
 
-    <!-- PÁGINA PRINCIPAL -->
     <div id="paginaInicio" class="pagina visivel">
         <section class="hero" id="inicio">
             <h1>Corte com Estilo e Precisão</h1>
@@ -51,7 +52,8 @@
 
         <section class="sobre" id="sobre">
             <h2>Sobre Nós</h2>
-            <p>Somos uma barbearia dedicada a oferecer o melhor atendimento e qualidade. Com profissionais experientes, unimos técnicas tradicionais e tendências atuais para garantir o seu melhor visual.</p>
+            <p>Somos uma barbearia dedicada a oferecer o melhor atendimento e qualidade. Com profissionais experientes,
+                unimos técnicas tradicionais e tendências atuais para garantir o seu melhor visual.</p>
         </section>
 
         <section class="contato" id="contato">
@@ -68,12 +70,12 @@
         </footer>
     </div>
 
-    <!-- PÁGINA DE AGENDAMENTO -->
     <div id="paginaAgendamento" class="pagina">
         <section class="agendamento">
             <div class="agendamento-container">
                 <h2>📅 Agende seu Horário</h2>
-                <p class="agendamento-desc">Preencha os dados abaixo para solicitar seu agendamento. Entraremos em contato em breve para confirmar.</p>
+                <p class="agendamento-desc">Preencha os dados abaixo para solicitar seu agendamento. Entraremos em
+                    contato em breve para confirmar.</p>
 
                 <form id="formAgendamento">
                     <div class="form-group">
@@ -83,7 +85,8 @@
 
                     <div class="form-group">
                         <label for="telefone">Telefone / WhatsApp *</label>
-                        <input type="tel" id="telefone" name="telefone" required maxlength="15" placeholder="(41) 9XXXX-XXXX">
+                        <input type="tel" id="telefone" name="telefone" required maxlength="15"
+                            placeholder="(41) 9XXXX-XXXX">
                     </div>
 
                     <div class="form-group">
@@ -98,10 +101,11 @@
                         </select>
                     </div>
 
-                <div class="form-group">
-                    <label for="data">Data Preferencial *</label>
-                    <input type="date" id="data" name="data" required onclick="this.showPicker()" onkeydown="return false;">
-                </div>
+                    <div class="form-group">
+                        <label for="data">Data Preferencial *</label>
+                        <input type="date" id="data" name="data" required onclick="this.showPicker()"
+                            onkeydown="return false;">
+                    </div>
 
                     <div class="form-group">
                         <label for="horario">Horário Preferencial *</label>
@@ -121,7 +125,8 @@
 
                     <div class="form-group">
                         <label for="observacoes">Observações (opcional)</label>
-                        <textarea id="observacoes" rows="4" placeholder="Alguma preferência ou informação adicional?"></textarea>
+                        <textarea id="observacoes" rows="4"
+                            placeholder="Alguma preferência ou informação adicional?"></textarea>
                     </div>
 
                     <div class="info-importante">
@@ -136,20 +141,21 @@
 
                     <div class="botoes-form">
                         <button type="submit" class="btn">Enviar Solicitação</button>
-                        <button type="button" class="btn btn-voltar" onclick="voltarParaInicio()">← Voltar para a Página Principal</button>
+                        <button type="button" class="btn btn-voltar" onclick="voltarParaInicio()">← Voltar para a Página
+                            Principal</button>
                     </div>
                 </form>
             </div>
         </section>
     </div>
 
-    <!-- ✅ PÁGINA DE CONFIRMAÇÃO -->
     <div id="paginaConfirmacao" class="pagina">
         <section class="confirmacao">
             <div class="confirmacao-container">
                 <div class="icone-sucesso">✅</div>
                 <h2>Solicitação Enviada!</h2>
-                <p class="confirmacao-desc">Recebemos seu agendamento! Entraremos em contato em breve pelo WhatsApp para confirmar seu horário.</p>
+                <p class="confirmacao-desc">Recebemos seu agendamento! Entraremos em contato em breve pelo WhatsApp para
+                    confirmar seu horário.</p>
 
                 <div class="resumo-agendamento">
                     <h3>📋 Resumo do Agendamento</h3>
@@ -163,25 +169,29 @@
                 </div>
 
                 <div class="aviso-confirmacao">
-                    <p>⏰ <strong>Atenção:</strong> este horário será confirmado pela barbearia em até 24h. Você receberá a confirmação no WhatsApp informado.</p>
+                    <p>⏰ <strong>Atenção:</strong> este horário será confirmado pela barbearia em até 24h. Você receberá
+                        a confirmação no WhatsApp informado.</p>
                 </div>
 
                 <div class="botoes-form">
-                    <button type="button" class="btn" onclick="voltarParaInicio()">🏠 Voltar para a Página Principal</button>
-                    <button type="button" class="btn btn-voltar" onclick="irParaAgendamento()">📅 Fazer Novo Agendamento</button>
+                    <button type="button" class="btn" onclick="voltarParaInicio()">🏠 Voltar para a Página
+                        Principal</button>
+                    <button type="button" class="btn btn-voltar" onclick="irParaAgendamento()">📅 Fazer Novo
+                        Agendamento</button>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- Ligação com o JavaScript -->
+
     <script src="script.js"></script>
-    <!-- ✅ ÍCONE FLUTUANTE DO WHATSAPP -->
-<!-- ✅ ÍCONE FLUTUANTE DO WHATSAPP -->
-<a href="https://wa.me/+5541989037866" target="_blank" class="whatsapp-flutuante" title="Fale pelo WhatsApp">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="32" height="32">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.37-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.21 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c0-5.451 4.436-9.888 9.888-9.888 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.452-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-  </svg>
-</a>
+
+    <a href="https://wa.me/+5541989037866" target="_blank" class="whatsapp-flutuante" title="Fale pelo WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="32" height="32">
+            <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.37-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.21 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c0-5.451 4.436-9.888 9.888-9.888 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.452-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+    </a>
 </body>
+
 </html>

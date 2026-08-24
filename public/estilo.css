@@ -485,3 +485,38 @@ footer {
   transform: scale(1.15);
   background-color: #128C7E;
 }
+
+/* ✅ AJUSTE PARA CELULAR — Sem alterar seus estilos */
+@media (max-width: 480px) {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    margin: 0;
+    padding: 0.8rem;
+  }
+
+  /* Formulário e campos */
+  input, select, textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* Botões */
+  .btn, button, a.btn {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* Calendário de data continua funcionando normal */
+  input[type="date"] {
+    min-height: 44px;
+  }
+}
