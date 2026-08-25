@@ -14,9 +14,13 @@ app.use(express.json());
 const pastaPublica = path.join(__dirname, '..', 'public');
 app.use(express.static(pastaPublica));
 
-// ✅ CONEXÃO — USA A URL QUE O RENDER CRIA AUTOMATICAMENTE!
+// ✅ CONEXÃO — NOMES EXATOS que estão no Render!
 const db = new Client({
-  connectionString: process.env.DATABASE_URL,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORTA || 5432,
+  database: process.env.DB_NOME,
+  user: process.env.DB_USUARIO,
+  password: process.env.DB_SENHA,
   ssl: { rejectUnauthorized: false }
 });
 
