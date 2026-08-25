@@ -24,26 +24,29 @@ const db = new Client({
   ssl: { rejectUnauthorized: false }
 });
 
-// ✅ Formatar DATA — padrão ISO (AAAA-MM-DD) — Horário do Brasil
+// ✅ Formatar DATA — SEM ALTERAR O DIA que o usuário escolheu!
 function formatarDataISO(data) {
+  // Se já veio no formato AAAA-MM-DD → usa direto!
+  if (/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+    return data;
+  }
+  // Se for objeto Date → extrai sem mudar o dia
   const d = new Date(data);
-  const brasil = new Date(d.getTime() - (3 * 60 * 60 * 1000));
-  const ano = brasil.getFullYear();
-  const mes = String(brasil.getMonth() + 1).padStart(2, '0');
-  const dia = String(brasil.getDate()).padStart(2, '0');
+  const ano = d.getFullYear();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
   return `${ano}-${mes}-${dia}`;
 }
 
-// ✅ Formatar DATA e HORA — padrão ISO (AAAA-MM-DD HH:MM:SS) — Horário do Brasil
+// ✅ Formatar DATA e HORA — Horário do Brasil
 function formatarDataHoraISO(data) {
   const d = new Date(data);
-  const brasil = new Date(d.getTime() - (3 * 60 * 60 * 1000));
-  const ano = brasil.getFullYear();
-  const mes = String(brasil.getMonth() + 1).padStart(2, '0');
-  const dia = String(brasil.getDate()).padStart(2, '0');
-  const hora = String(brasil.getHours()).padStart(2, '0');
-  const min = String(brasil.getMinutes()).padStart(2, '0');
-  const seg = String(brasil.getSeconds()).padStart(2, '0');
+  const ano = d.getFullYear();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  const hora = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  const seg = String(d.getSeconds()).padStart(2, '0');
   return `${ano}-${mes}-${dia} ${hora}:${min}:${seg}`;
 }
 
@@ -192,7 +195,7 @@ app.get('/api/horarios-ocupados/:data', (req, res) => {
   });
 });
 
-// ✅ CRIAR agendamento — com VALIDAÇÃO de 100 caracteres nas observações
+// ✅ CRIAR agendamento — com DATA CORRIGIDA e limite de 100 caracteres nas observações
 app.post('/api/agendamento', (req, res) => {
   const { nome, telefone, servico, servicoValor, data, horario, observacoes } = req.body;
 
@@ -239,7 +242,7 @@ app.post('/api/agendamento', (req, res) => {
     // ✅ Garantir que observações não passe de 100 caracteres
     const obsSalvar = observacoes ? observacoes.substring(0, 100) : 'Nenhuma';
 
-    // ✅ Salvar no banco
+    // ✅ Salvar no banco — DATA EXATA que o usuário escolheu, sem alteração!
     const sql = `INSERT INTO agendamentos (nome, telefone, servico, servico_valor, data, horario, observacoes) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`;
     const valores = [nome, telefone, servico, servicoValor, data, horario, obsSalvar];
 
