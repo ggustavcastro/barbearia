@@ -24,23 +24,24 @@ const db = new Client({
   ssl: { rejectUnauthorized: false }
 });
 
-// ✅ Função para formatar data no padrão BR
-function formatarData(data) {
+// ✅ Função para formatar DATA em padrão ISO (YYYY-MM-DD)
+function formatarDataISO(data) {
   const d = new Date(data);
-  return d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+  const ano = d.getFullYear();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
 }
 
-// ✅ Função para formatar data e hora completa no horário do Brasil
-function formatarDataHora(data) {
+// ✅ Função para formatar DATA e HORA completa em padrão ISO
+function formatarDataHoraISO(data) {
   const d = new Date(data);
-  return d.toLocaleString('pt-BR', { 
-    timeZone: 'America/Sao_Paulo',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const ano = d.getFullYear();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  const hora = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${ano}-${mes}-${dia} ${hora}:${min}`;
 }
 
 // ✅ Conectar e criar tabela
@@ -86,7 +87,7 @@ app.get('/api/agendamentos', (req, res) => {
   });
 });
 
-// ✅ Visualização em TABELA BONITA com datas formatadas
+// ✅ Visualização em TABELA com datas em formato ISO
 app.get('/tabela-agendamentos', (req, res) => {
   db.query('SELECT * FROM agendamentos ORDER BY id DESC', (erro, resultado) => {
     if (erro) return res.send(`<h2>Erro: ${erro.message}</h2>`);
@@ -138,10 +139,10 @@ app.get('/tabela-agendamentos', (req, res) => {
           <td>${l.nome}</td>
           <td>${l.telefone}</td>
           <td>${l.servico}</td>
-          <td>${formatarData(l.data)}</td>
+          <td>${formatarDataISO(l.data)}</td>
           <td>${l.horario}</td>
           <td>${l.observacoes || '-'}</td>
-          <td>${formatarDataHora(l.data_criacao)}</td>
+          <td>${formatarDataHoraISO(l.data_criacao)}</td>
         </tr>`;
       });
     }
@@ -220,13 +221,13 @@ app.post('/api/agendamento', (req, res) => {
     db.query(sql, valores, (erro, resultado) => {
       if (erro) return res.json({ sucesso: false, mensagem: 'Erro ao salvar agendamento.' });
 
-      // ✅ Mensagem WhatsApp formatada
+      // ✅ Mensagem WhatsApp com data em formato ISO
       const mensagem = `NOVO AGENDAMENTO
 
 Nome: ${nome}
 Telefone: ${telefone}
 Serviço: ${servico}
-Data: ${formatarData(data)}
+Data: ${formatarDataISO(data)}
 Horário: ${horario}
 Observações: ${observacoes || 'Nenhuma'}`;
 
