@@ -10,8 +10,8 @@ const PORT = process.env.PORT || 3001;
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-// ✅ Servindo os arquivos do site
-const pastaPublica = path.join(__dirname, '..', '..');
+// ✅ CAMINHO CERTO: saindo de backend → entrando na pasta public
+const pastaPublica = path.join(__dirname, '..', 'public');
 app.use(express.static(pastaPublica));
 
 // ✅ CONEXÃO COM POSTGRESQL PERMANENTE
