@@ -5,7 +5,7 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10000;
 
 app.use(cors({ origin: true }));
 app.use(express.json());
@@ -14,9 +14,13 @@ app.use(express.json());
 const pastaPublica = path.join(__dirname, '..', 'public');
 app.use(express.static(pastaPublica));
 
-// ✅ CONEXÃO COM POSTGRESQL PERMANENTE
+// ✅ CONEXÃO COM AS VARIÁVEIS QUE JÁ ESTÃO NO RENDER
 const db = new Client({
-  connectionString: process.env.DATABASE_URL,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   ssl: { rejectUnauthorized: false }
 });
 
