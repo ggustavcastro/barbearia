@@ -14,13 +14,9 @@ app.use(express.json());
 const pastaPublica = path.join(__dirname, '..', 'public');
 app.use(express.static(pastaPublica));
 
-// ✅ CONEXÃO COM AS VARIÁVEIS QUE JÁ ESTÃO NO RENDER
+// ✅ CONEXÃO — USA A URL QUE O RENDER CRIA AUTOMATICAMENTE!
 const db = new Client({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
@@ -144,8 +140,7 @@ app.get('/tabela-agendamentos', (req, res) => {
       <th>Obs</th>
       <th>Data/Hora</th>
       <th>Ação</th>
-    </tr>
-    `;
+    </tr>`;
 
     if (linhas.length === 0) {
       html += `<tr><td colspan="9" class="vazio">📭 Nenhum agendamento salvo ainda!</td></tr>`;
