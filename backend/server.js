@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
+const { Client } = require('pg');
 const path = require('path');
 require('dotenv').config();
 
@@ -10,37 +10,47 @@ const PORT = process.env.PORT || 3001;
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-// ✅ Servindo os arquivos do site (na raiz do repositório)
+// ✅ Servindo os arquivos do site
 const pastaPublica = path.join(__dirname, '..');
 app.use(express.static(pastaPublica));
 
-// ✅ Conexão com o Banco de Dados
-const db = new sqlite3.Database(path.join(__dirname, 'barbearia.db'), (erro) => {
+// ✅ CONEXÃO COM POSTGRESQL PERMANENTE
+const db = new Client({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORTA || 5432,
+  database: process.env.DB_NOME,
+  user: process.env.DB_USUARIO,
+  password: process.env.DB_SENHA,
+  ssl: { rejectUnauthorized: false }
+});
+
+// ✅ Conectar e criar tabela
+db.connect((erro) => {
   if (erro) {
-    console.error('❌ ERRO ao abrir banco:', erro.message);
+    console.error('❌ ERRO ao conectar no banco:', erro.message);
   } else {
-    console.log('✅ Banco CONECTADO com sucesso!');
+    console.log('✅ Banco POSTGRESQL CONECTADO! Dados NÃO somem mais! 🔒');
     criarTabela();
   }
 });
 
-// ✅ Criar tabela se não existir
 function criarTabela() {
-  db.run(`
+  const sql = `
     CREATE TABLE IF NOT EXISTS agendamentos (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nome TEXT NOT NULL,
-      telefone TEXT NOT NULL,
-      servico TEXT NOT NULL,
-      servico_valor TEXT,
+      id SERIAL PRIMARY KEY,
+      nome VARCHAR(100) NOT NULL,
+      telefone VARCHAR(30) NOT NULL,
+      servico VARCHAR(100) NOT NULL,
+      servico_valor VARCHAR(20),
       data DATE NOT NULL,
-      horario TEXT NOT NULL,
+      horario VARCHAR(10) NOT NULL,
       observacoes TEXT,
       data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
-  `, (erro) => {
+  `;
+  db.query(sql, (erro) => {
     if (erro) console.error('❌ Erro ao criar tabela:', erro.message);
-    else console.log('✅ Tabela PRONTA!');
+    else console.log('✅ Tabela PRONTA! Agendamentos salvos para sempre! 🎉');
   });
 }
 
@@ -49,21 +59,19 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(pastaPublica, 'index.html'));
 });
 
-// ✅ Listar TODOS os agendamentos (formato JSON)
+// ✅ Listar TODOS os agendamentos
 app.get('/api/agendamentos', (req, res) => {
-  db.all('SELECT * FROM agendamentos ORDER BY data_criacao DESC', [], (erro, linhas) => {
+  db.query('SELECT * FROM agendamentos ORDER BY data_criacao DESC', (erro, resultado) => {
     if (erro) return res.status(500).json({ erro: erro.message });
-    res.json(linhas);
+    res.json(resultado.rows);
   });
 });
 
 // ✅ Visualização em TABELA BONITA
 app.get('/tabela-agendamentos', (req, res) => {
-  db.all('SELECT * FROM agendamentos ORDER BY data_criacao DESC', [], (erro, linhas) => {
-    if (erro) {
-      res.send(`<h2>Erro: ${erro.message}</h2>`);
-      return;
-    }
+  db.query('SELECT * FROM agendamentos ORDER BY data_criacao DESC', (erro, resultado) => {
+    if (erro) return res.send(`<h2>Erro: ${erro.message}</h2>`);
+    const linhas = resultado.rows;
 
     let html = `
     <!DOCTYPE html>
@@ -119,12 +127,7 @@ app.get('/tabela-agendamentos', (req, res) => {
       });
     }
 
-    html += `
-      </table>
-    </body>
-    </html>
-    `;
-
+    html += `</table></body></html>`;
     res.send(html);
   });
 });
@@ -132,9 +135,9 @@ app.get('/tabela-agendamentos', (req, res) => {
 // ✅ Verificar horários ocupados por data
 app.get('/api/horarios-ocupados/:data', (req, res) => {
   const data = req.params.data;
-  db.all('SELECT horario FROM agendamentos WHERE data = ?', [data], (erro, linhas) => {
+  db.query('SELECT horario FROM agendamentos WHERE data = $1', [data], (erro, resultado) => {
     if (erro) return res.json({ erro: erro.message });
-    res.json({ horariosOcupados: linhas.map(l => l.horario) });
+    res.json({ horariosOcupados: resultado.rows.map(l => l.horario) });
   });
 });
 
@@ -142,12 +145,11 @@ app.get('/api/horarios-ocupados/:data', (req, res) => {
 app.post('/api/agendamento', (req, res) => {
   const { nome, telefone, servico, servicoValor, data, horario, observacoes } = req.body;
 
-  // Validação de campos obrigatórios
   if (!nome || !telefone || !servico || !data || !horario) {
     return res.json({ sucesso: false, mensagem: 'Preencha todos os campos obrigatórios!' });
   }
 
-  // ✅ VALIDAÇÃO DE TELEFONE — precisa ter 11 dígitos
+  // ✅ VALIDAÇÃO DE TELEFONE — 11 dígitos
   const apenasNumeros = telefone.replace(/\D/g, '');
   if (apenasNumeros.length !== 11) {
     return res.json({ 
@@ -156,13 +158,11 @@ app.post('/api/agendamento', (req, res) => {
     });
   }
 
-  // Validação de formato de data
   const regexData = /^\d{4}-\d{2}-\d{2}$/;
   if (!regexData.test(data)) {
     return res.json({ sucesso: false, mensagem: 'Formato de data inválido!' });
   }
 
-  // Validação: data não pode ser no passado
   const dataHoje = new Date();
   dataHoje.setHours(0, 0, 0, 0);
   const dataAgendamento = new Date(data + 'T00:00:00');
@@ -170,21 +170,16 @@ app.post('/api/agendamento', (req, res) => {
     return res.json({ sucesso: false, mensagem: 'Não é possível agendar em datas passadas!' });
   }
 
-  // Validação de formato de horário
   const regexHorario = /^([01]\d|2[0-3]):([0-5]\d)$/;
   if (!regexHorario.test(horario)) {
     return res.json({ sucesso: false, mensagem: 'Horário inválido! Use HH:MM' });
   }
 
-  // ✅ VALIDAÇÃO DE DIA E HORÁRIO DE ATENDIMENTO
-  const diaSemana = dataAgendamento.getDay(); // 0=Domingo, 1=Segunda, 6=Sábado
-
-  // ❌ Domingo = não atende
+  // ✅ VALIDAÇÃO DE DIA
+  const diaSemana = dataAgendamento.getDay();
   if (diaSemana === 0) {
     return res.json({ sucesso: false, mensagem: '❌ Não atendemos aos domingos! Escolha outra data.' });
   }
-
-  // 📅 Sábado = só até 15:00
   if (diaSemana === 6) {
     const [hora, minuto] = horario.split(':').map(Number);
     if (hora > 15 || (hora === 15 && minuto > 0)) {
@@ -192,19 +187,21 @@ app.post('/api/agendamento', (req, res) => {
     }
   }
 
-  // ✅ Verificar se horário JÁ está ocupado
-  db.get('SELECT * FROM agendamentos WHERE data = ? AND horario = ?', [data, horario], function(erro, resultado) {
+  // ✅ Verificar se horário está ocupado
+  db.query('SELECT * FROM agendamentos WHERE data = $1 AND horario = $2', [data, horario], (erro, resultado) => {
     if (erro) return res.json({ sucesso: false, mensagem: 'Erro ao verificar horário.' });
-    if (resultado) return res.json({ sucesso: false, mensagem: `Horário ${horario} JÁ está ocupado! Escolha outro.` });
+    if (resultado.rows.length > 0) {
+      return res.json({ sucesso: false, mensagem: `Horário ${horario} JÁ está ocupado! Escolha outro.` });
+    }
 
-    // ✅ Salvar no banco
-    const sql = `INSERT INTO agendamentos (nome, telefone, servico, servico_valor, data, horario, observacoes) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    // ✅ Salvar no banco PERMANENTE
+    const sql = `INSERT INTO agendamentos (nome, telefone, servico, servico_valor, data, horario, observacoes) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`;
     const valores = [nome, telefone, servico, servicoValor, data, horario, observacoes || ''];
 
-    db.run(sql, valores, function(erro) {
+    db.query(sql, valores, (erro, resultado) => {
       if (erro) return res.json({ sucesso: false, mensagem: 'Erro ao salvar agendamento.' });
 
-      // ✅ Mensagem WhatsApp formatada corretamente
+      // ✅ Mensagem WhatsApp formatada
       const mensagem = `NOVO AGENDAMENTO
 
 Nome: ${nome}
@@ -218,8 +215,8 @@ Observações: ${observacoes || 'Nenhuma'}`;
 
       res.json({ 
         sucesso: true, 
-        mensagem: '✅ Agendamento salvo com sucesso!', 
-        id: this.lastID,
+        mensagem: '✅ Agendamento SALVO PARA SEMPRE! 🔒', 
+        id: resultado.rows[0].id,
         linkWhatsApp: linkWhatsApp
       });
     });
