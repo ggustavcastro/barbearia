@@ -16,18 +16,13 @@ app.use(express.static(pastaPublica));
 
 // ✅ CONEXÃO COM POSTGRESQL PERMANENTE
 const db = new Client({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORTA || 5432,
-  database: process.env.DB_NOME,
-  user: process.env.DB_USUARIO,
-  password: process.env.DB_SENHA,
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
-// ✅ Função para formatar DATA — padrão ISO (AAAA-MM-DD) — Horário do Brasil
+// ✅ Formatar DATA — padrão ISO (AAAA-MM-DD) — Horário do Brasil
 function formatarDataISO(data) {
   const d = new Date(data);
-  // Subtrai 3 horas do horário UTC do servidor = Horário de Brasília
   const brasil = new Date(d.getTime() - (3 * 60 * 60 * 1000));
   const ano = brasil.getFullYear();
   const mes = String(brasil.getMonth() + 1).padStart(2, '0');
@@ -35,10 +30,9 @@ function formatarDataISO(data) {
   return `${ano}-${mes}-${dia}`;
 }
 
-// ✅ Função para formatar DATA e HORA — padrão ISO (AAAA-MM-DD HH:MM:SS) — Horário do Brasil
+// ✅ Formatar DATA e HORA — padrão ISO (AAAA-MM-DD HH:MM:SS) — Horário do Brasil
 function formatarDataHoraISO(data) {
   const d = new Date(data);
-  // Subtrai 3 horas do horário UTC do servidor = Horário de Brasília
   const brasil = new Date(d.getTime() - (3 * 60 * 60 * 1000));
   const ano = brasil.getFullYear();
   const mes = String(brasil.getMonth() + 1).padStart(2, '0');
@@ -75,7 +69,7 @@ function criarTabela() {
   `;
   db.query(sql, (erro) => {
     if (erro) console.error('❌ Erro ao criar tabela:', erro.message);
-    else console.log('✅ Tabela PRONTA! Agendamentos salvos para sempre! 🎉');
+    else console.log('✅ Tabela PRONTA! 🎉');
   });
 }
 
@@ -92,50 +86,65 @@ app.get('/api/agendamentos', (req, res) => {
   });
 });
 
-// ✅ Visualização em TABELA com datas corretas do Brasil
+// ✅ EXCLUIR agendamento por ID
+app.delete('/api/agendamento/:id', (req, res) => {
+  const id = req.params.id;
+  db.query('DELETE FROM agendamentos WHERE id = $1', [id], (erro, resultado) => {
+    if (erro) return res.json({ sucesso: false, mensagem: 'Erro ao excluir!' });
+    if (resultado.rowCount === 0) {
+      return res.json({ sucesso: false, mensagem: 'Nenhum agendamento encontrado com esse ID!' });
+    }
+    res.json({ sucesso: true, mensagem: `✅ Agendamento ID ${id} EXCLUÍDO com sucesso!` });
+  });
+});
+
+// ✅ TABELA com BOTÃO EXCLUIR
 app.get('/tabela-agendamentos', (req, res) => {
   db.query('SELECT * FROM agendamentos ORDER BY id DESC', (erro, resultado) => {
     if (erro) return res.send(`<h2>Erro: ${erro.message}</h2>`);
     const linhas = resultado.rows;
 
     let html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>📋 Agendamentos - Barbearia Estilo</title>
-      <style>
-        * { font-family: Arial, sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f2f5; padding: 20px; }
-        h1 { text-align: center; color: #1a1a2e; margin-bottom: 25px; }
-        .info { text-align: center; margin-bottom: 15px; color: #555; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        th { background: #1a1a2e; color: #ffd700; padding: 12px 8px; text-align: left; font-size: 14px; }
-        td { padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
-        tr:hover { background: #f8f9fa; }
-        .vazio { text-align: center; padding: 40px; color: #888; font-size: 16px; }
-        @media(max-width: 768px) { th, td { padding: 8px 4px; font-size: 11px; } }
-      </style>
-    </head>
-    <body>
-      <h1>📋 Agendamentos Salvos no Banco</h1>
-      <p class="info">Total: ${linhas.length} agendamento(s)</p>
-      <table>
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Telefone</th>
-          <th>Serviço</th>
-          <th>Data</th>
-          <th>Horário</th>
-          <th>Obs</th>
-          <th>Data/Hora</th>
-        </tr>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📋 Agendamentos - Barbearia Estilo</title>
+  <style>
+    * { font-family: Arial, sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #f0f2f5; padding: 20px; }
+    h1 { text-align: center; color: #1a1a2e; margin-bottom: 25px; }
+    .info { text-align: center; margin-bottom: 15px; color: #555; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    th { background: #1a1a2e; color: #ffd700; padding: 12px 8px; text-align: left; font-size: 14px; }
+    td { padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
+    tr:hover { background: #f8f9fa; }
+    .vazio { text-align: center; padding: 40px; color: #888; font-size: 16px; }
+    .excluir { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+    .excluir:hover { background: #c0392b; }
+    @media(max-width: 768px) { th, td { padding: 8px 4px; font-size: 11px; } .excluir { padding: 4px 8px; font-size: 11px; } }
+  </style>
+</head>
+<body>
+  <h1>📋 Agendamentos Salvos no Banco</h1>
+  <p class="info">Total: ${linhas.length} agendamento(s)</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Telefone</th>
+      <th>Serviço</th>
+      <th>Data</th>
+      <th>Horário</th>
+      <th>Obs</th>
+      <th>Data/Hora</th>
+      <th>Ação</th>
+    </tr>
     `;
 
     if (linhas.length === 0) {
-      html += `<tr><td colspan="8" class="vazio">📭 Nenhum agendamento salvo ainda!</td></tr>`;
+      html += `<tr><td colspan="9" class="vazio">📭 Nenhum agendamento salvo ainda!</td></tr>`;
     } else {
       linhas.forEach(l => {
         html += `
@@ -148,16 +157,30 @@ app.get('/tabela-agendamentos', (req, res) => {
           <td>${l.horario}</td>
           <td>${l.observacoes || '-'}</td>
           <td>${formatarDataHoraISO(l.data_criacao)}</td>
+          <td><button class="excluir" onclick="excluir(${l.id})">Excluir</button></td>
         </tr>`;
       });
     }
 
-    html += `</table></body></html>`;
+    html += `
+  </table>
+  <script>
+    async function excluir(id) {
+      if (confirm('⚠️ Tem certeza que deseja EXCLUIR o agendamento ID ' + id + '?')) {
+        const res = await fetch('/api/agendamento/' + id, { method: 'DELETE' });
+        const dados = await res.json();
+        alert(dados.mensagem);
+        if (dados.sucesso) location.reload();
+      }
+    }
+  </script>
+</body>
+</html>`;
     res.send(html);
   });
 });
 
-// ✅ Verificar horários ocupados por data
+// ✅ Verificar horários ocupados
 app.get('/api/horarios-ocupados/:data', (req, res) => {
   const data = req.params.data;
   db.query('SELECT horario FROM agendamentos WHERE data = $1', [data], (erro, resultado) => {
@@ -166,7 +189,7 @@ app.get('/api/horarios-ocupados/:data', (req, res) => {
   });
 });
 
-// ✅ CRIAR AGENDAMENTO com TODAS as validações
+// ✅ CRIAR agendamento
 app.post('/api/agendamento', (req, res) => {
   const { nome, telefone, servico, servicoValor, data, horario, observacoes } = req.body;
 
@@ -174,60 +197,45 @@ app.post('/api/agendamento', (req, res) => {
     return res.json({ sucesso: false, mensagem: 'Preencha todos os campos obrigatórios!' });
   }
 
-  // ✅ VALIDAÇÃO DE TELEFONE — 11 dígitos
+  // ✅ Validar telefone (11 dígitos)
   const apenasNumeros = telefone.replace(/\D/g, '');
   if (apenasNumeros.length !== 11) {
-    return res.json({ 
-      sucesso: false, 
-      mensagem: '⚠️ O telefone precisa ter 11 dígitos! (DDD + 9 números)\nExemplo: (41) 99999-9999' 
-    });
+    return res.json({ sucesso: false, mensagem: '⚠️ Telefone precisa ter 11 dígitos!' });
   }
 
+  // ✅ Validar formato da data
   const regexData = /^\d{4}-\d{2}-\d{2}$/;
   if (!regexData.test(data)) {
     return res.json({ sucesso: false, mensagem: 'Formato de data inválido!' });
   }
 
-  const dataHoje = new Date();
-  dataHoje.setHours(0, 0, 0, 0);
+  // ✅ Validar horário de atendimento
   const dataAgendamento = new Date(data + 'T00:00:00');
-  if (dataAgendamento < dataHoje) {
-    return res.json({ sucesso: false, mensagem: 'Não é possível agendar em datas passadas!' });
-  }
-
-  const regexHorario = /^([01]\d|2[0-3]):([0-5]\d)$/;
-  if (!regexHorario.test(horario)) {
-    return res.json({ sucesso: false, mensagem: 'Horário inválido! Use HH:MM' });
-  }
-
-  // ✅ VALIDAÇÃO DE DIA
   const diaSemana = dataAgendamento.getDay();
+  const horaAgendamento = parseInt(horario.split(':')[0]);
+
   if (diaSemana === 0) {
-    return res.json({ sucesso: false, mensagem: '❌ Não atendemos aos domingos! Escolha outra data.' });
+    return res.json({ sucesso: false, mensagem: '❌ Não atendemos aos domingos!' });
   }
-  if (diaSemana === 6) {
-    const [hora, minuto] = horario.split(':').map(Number);
-    if (hora > 15 || (hora === 15 && minuto > 0)) {
-      return res.json({ sucesso: false, mensagem: '⚠️ Aos sábados atendemos só até às 15:00! Escolha um horário anterior.' });
-    }
+  if (diaSemana === 6 && horaAgendamento >= 15) {
+    return res.json({ sucesso: false, mensagem: '⚠️ Sábado atendemos só até às 15:00!' });
   }
 
-  // ✅ Verificar se horário está ocupado
+  // ✅ Verificar se horário já está ocupado
   db.query('SELECT * FROM agendamentos WHERE data = $1 AND horario = $2', [data, horario], (erro, resultado) => {
     if (erro) return res.json({ sucesso: false, mensagem: 'Erro ao verificar horário.' });
     if (resultado.rows.length > 0) {
       return res.json({ sucesso: false, mensagem: `Horário ${horario} JÁ está ocupado! Escolha outro.` });
     }
 
-    // ✅ Salvar no banco PERMANENTE
+    // ✅ Salvar no banco
     const sql = `INSERT INTO agendamentos (nome, telefone, servico, servico_valor, data, horario, observacoes) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`;
     const valores = [nome, telefone, servico, servicoValor, data, horario, observacoes || ''];
 
     db.query(sql, valores, (erro, resultado) => {
       if (erro) return res.json({ sucesso: false, mensagem: 'Erro ao salvar agendamento.' });
 
-      // ✅ Mensagem WhatsApp com data no formato correto
-      const mensagem = `NOVO AGENDAMENTO
+      const mensagemWhatsApp = `NOVO AGENDAMENTO
 
 Nome: ${nome}
 Telefone: ${telefone}
@@ -236,13 +244,11 @@ Data: ${formatarDataISO(data)}
 Horário: ${horario}
 Observações: ${observacoes || 'Nenhuma'}`;
 
-      const linkWhatsApp = `https://wa.me/+5541989037866?text=${encodeURIComponent(mensagem)}`;
-
-      res.json({ 
-        sucesso: true, 
-        mensagem: '✅ Agendamento SALVO PARA SEMPRE! 🔒', 
+      res.json({
+        sucesso: true,
+        mensagem: '✅ Agendamento SALVO PARA SEMPRE! 🔒',
         id: resultado.rows[0].id,
-        linkWhatsApp: linkWhatsApp
+        mensagemWhatsApp: encodeURIComponent(mensagemWhatsApp)
       });
     });
   });
