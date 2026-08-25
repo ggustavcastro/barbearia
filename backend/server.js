@@ -36,10 +36,12 @@ function formatarDataISO(data) {
   return `${ano}-${mes}-${dia}`;
 }
 
-// ✅ Formatar DATA e HORA — HORÁRIO DO BRASIL (sem UTC!)
+// ✅ Formatar DATA e HORA — SUBTRAI 3 HORAS (UTC → Horário de Brasília)
 function formatarDataHoraISO(data) {
   const d = new Date(data);
-  // ✅ Pega direto no horário local do servidor (Brasil)
+  // ✅ Converte UTC → Horário de Brasília (-3h)
+  d.setHours(d.getHours() - 3);
+  
   const ano = d.getFullYear();
   const mes = String(d.getMonth() + 1).padStart(2, '0');
   const dia = String(d.getDate()).padStart(2, '0');
@@ -194,7 +196,7 @@ app.get('/api/horarios-ocupados/:data', (req, res) => {
   });
 });
 
-// ✅ CRIAR agendamento — DATA e HORA CORRETAS!
+// ✅ CRIAR agendamento — DATA e HORA CORRIGIDAS!
 app.post('/api/agendamento', (req, res) => {
   const { nome, telefone, servico, servicoValor, data, horario, observacoes } = req.body;
 
