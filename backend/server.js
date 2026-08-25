@@ -11,7 +11,7 @@ app.use(cors({ origin: true }));
 app.use(express.json());
 
 // ✅ Servindo os arquivos do site
-const pastaPublica = path.join(__dirname, '..');
+const pastaPublica = path.join(__dirname, '..', '..');
 app.use(express.static(pastaPublica));
 
 // ✅ CONEXÃO COM POSTGRESQL PERMANENTE
