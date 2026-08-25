@@ -125,9 +125,23 @@
 
                     <div class="form-group">
                         <label for="observacoes">Observações (opcional)</label>
-                        <textarea id="observacoes" rows="4"
-                            placeholder="Alguma preferência ou informação adicional?"></textarea>
+                        <textarea id="observacoes" rows="4" maxlength="100"
+                            placeholder="Alguma preferência ou informação adicional? (máximo 100 caracteres)"
+                            oninput="atualizarContador(this)"></textarea>
+                        <small id="contador-obs" style="color: #666;">0 / 100 caracteres</small>
                     </div>
+
+                    <script>
+                        function atualizarContador(campo) {
+                            const contador = document.getElementById('contador-obs');
+                            contador.textContent = `${campo.value.length} / 100 caracteres`;
+                            if (campo.value.length >= 100) {
+                                contador.style.color = 'red';
+                            } else {
+                                contador.style.color = '#666';
+                            }
+                        }
+                    </script>
 
                     <div class="info-importante">
                         <h3>ℹ️ Informações Importantes</h3>

@@ -67,7 +67,7 @@ function criarTabela() {
       servico_valor VARCHAR(20),
       data DATE NOT NULL,
       horario VARCHAR(10) NOT NULL,
-      observacoes TEXT,
+      observacoes VARCHAR(100),
       data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `;
@@ -192,7 +192,7 @@ app.get('/api/horarios-ocupados/:data', (req, res) => {
   });
 });
 
-// ✅ CRIAR agendamento
+// ✅ CRIAR agendamento — com VALIDAÇÃO de 100 caracteres nas observações
 app.post('/api/agendamento', (req, res) => {
   const { nome, telefone, servico, servicoValor, data, horario, observacoes } = req.body;
 
@@ -204,6 +204,11 @@ app.post('/api/agendamento', (req, res) => {
   const apenasNumeros = telefone.replace(/\D/g, '');
   if (apenasNumeros.length !== 11) {
     return res.json({ sucesso: false, mensagem: '⚠️ Telefone precisa ter 11 dígitos!' });
+  }
+
+  // ✅ Validar limite de 100 caracteres nas observações
+  if (observacoes && observacoes.length > 100) {
+    return res.json({ sucesso: false, mensagem: `⚠️ Observações muito longas! Máximo de 100 caracteres (você digitou ${observacoes.length}).` });
   }
 
   // ✅ Validar formato da data
@@ -231,9 +236,12 @@ app.post('/api/agendamento', (req, res) => {
       return res.json({ sucesso: false, mensagem: `Horário ${horario} JÁ está ocupado! Escolha outro.` });
     }
 
+    // ✅ Garantir que observações não passe de 100 caracteres
+    const obsSalvar = observacoes ? observacoes.substring(0, 100) : 'Nenhuma';
+
     // ✅ Salvar no banco
     const sql = `INSERT INTO agendamentos (nome, telefone, servico, servico_valor, data, horario, observacoes) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`;
-    const valores = [nome, telefone, servico, servicoValor, data, horario, observacoes || ''];
+    const valores = [nome, telefone, servico, servicoValor, data, horario, obsSalvar];
 
     db.query(sql, valores, (erro, resultado) => {
       if (erro) return res.json({ sucesso: false, mensagem: 'Erro ao salvar agendamento.' });
@@ -245,7 +253,7 @@ Telefone: ${telefone}
 Serviço: ${servico}
 Data: ${formatarDataISO(data)}
 Horário: ${horario}
-Observações: ${observacoes || 'Nenhuma'}`;
+Observações: ${obsSalvar}`;
 
       res.json({
         sucesso: true,
