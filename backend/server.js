@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3001;
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-// ✅ CAMINHO CERTO: saindo de backend → entrando na pasta public
+// ✅ Caminho correto para a pasta public
 const pastaPublica = path.join(__dirname, '..', 'public');
 app.use(express.static(pastaPublica));
 
@@ -23,6 +23,25 @@ const db = new Client({
   password: process.env.DB_SENHA,
   ssl: { rejectUnauthorized: false }
 });
+
+// ✅ Função para formatar data no padrão BR
+function formatarData(data) {
+  const d = new Date(data);
+  return d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+}
+
+// ✅ Função para formatar data e hora completa no horário do Brasil
+function formatarDataHora(data) {
+  const d = new Date(data);
+  return d.toLocaleString('pt-BR', { 
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
 
 // ✅ Conectar e criar tabela
 db.connect((erro) => {
@@ -67,9 +86,9 @@ app.get('/api/agendamentos', (req, res) => {
   });
 });
 
-// ✅ Visualização em TABELA BONITA
+// ✅ Visualização em TABELA BONITA com datas formatadas
 app.get('/tabela-agendamentos', (req, res) => {
-  db.query('SELECT * FROM agendamentos ORDER BY data_criacao DESC', (erro, resultado) => {
+  db.query('SELECT * FROM agendamentos ORDER BY id DESC', (erro, resultado) => {
     if (erro) return res.send(`<h2>Erro: ${erro.message}</h2>`);
     const linhas = resultado.rows;
 
@@ -119,10 +138,10 @@ app.get('/tabela-agendamentos', (req, res) => {
           <td>${l.nome}</td>
           <td>${l.telefone}</td>
           <td>${l.servico}</td>
-          <td>${l.data}</td>
+          <td>${formatarData(l.data)}</td>
           <td>${l.horario}</td>
           <td>${l.observacoes || '-'}</td>
-          <td>${l.data_criacao || '-'}</td>
+          <td>${formatarDataHora(l.data_criacao)}</td>
         </tr>`;
       });
     }
@@ -207,7 +226,7 @@ app.post('/api/agendamento', (req, res) => {
 Nome: ${nome}
 Telefone: ${telefone}
 Serviço: ${servico}
-Data: ${data}
+Data: ${formatarData(data)}
 Horário: ${horario}
 Observações: ${observacoes || 'Nenhuma'}`;
 
