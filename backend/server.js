@@ -24,24 +24,29 @@ const db = new Client({
   ssl: { rejectUnauthorized: false }
 });
 
-// ✅ Função para formatar DATA em padrão ISO (YYYY-MM-DD)
+// ✅ Função para formatar DATA — padrão ISO (AAAA-MM-DD) — Horário do Brasil
 function formatarDataISO(data) {
   const d = new Date(data);
-  const ano = d.getFullYear();
-  const mes = String(d.getMonth() + 1).padStart(2, '0');
-  const dia = String(d.getDate()).padStart(2, '0');
+  // Subtrai 3 horas do horário UTC do servidor = Horário de Brasília
+  const brasil = new Date(d.getTime() - (3 * 60 * 60 * 1000));
+  const ano = brasil.getFullYear();
+  const mes = String(brasil.getMonth() + 1).padStart(2, '0');
+  const dia = String(brasil.getDate()).padStart(2, '0');
   return `${ano}-${mes}-${dia}`;
 }
 
-// ✅ Função para formatar DATA e HORA completa em padrão ISO
+// ✅ Função para formatar DATA e HORA — padrão ISO (AAAA-MM-DD HH:MM:SS) — Horário do Brasil
 function formatarDataHoraISO(data) {
   const d = new Date(data);
-  const ano = d.getFullYear();
-  const mes = String(d.getMonth() + 1).padStart(2, '0');
-  const dia = String(d.getDate()).padStart(2, '0');
-  const hora = String(d.getHours()).padStart(2, '0');
-  const min = String(d.getMinutes()).padStart(2, '0');
-  return `${ano}-${mes}-${dia} ${hora}:${min}`;
+  // Subtrai 3 horas do horário UTC do servidor = Horário de Brasília
+  const brasil = new Date(d.getTime() - (3 * 60 * 60 * 1000));
+  const ano = brasil.getFullYear();
+  const mes = String(brasil.getMonth() + 1).padStart(2, '0');
+  const dia = String(brasil.getDate()).padStart(2, '0');
+  const hora = String(brasil.getHours()).padStart(2, '0');
+  const min = String(brasil.getMinutes()).padStart(2, '0');
+  const seg = String(brasil.getSeconds()).padStart(2, '0');
+  return `${ano}-${mes}-${dia} ${hora}:${min}:${seg}`;
 }
 
 // ✅ Conectar e criar tabela
@@ -87,7 +92,7 @@ app.get('/api/agendamentos', (req, res) => {
   });
 });
 
-// ✅ Visualização em TABELA com datas em formato ISO
+// ✅ Visualização em TABELA com datas corretas do Brasil
 app.get('/tabela-agendamentos', (req, res) => {
   db.query('SELECT * FROM agendamentos ORDER BY id DESC', (erro, resultado) => {
     if (erro) return res.send(`<h2>Erro: ${erro.message}</h2>`);
@@ -221,7 +226,7 @@ app.post('/api/agendamento', (req, res) => {
     db.query(sql, valores, (erro, resultado) => {
       if (erro) return res.json({ sucesso: false, mensagem: 'Erro ao salvar agendamento.' });
 
-      // ✅ Mensagem WhatsApp com data em formato ISO
+      // ✅ Mensagem WhatsApp com data no formato correto
       const mensagem = `NOVO AGENDAMENTO
 
 Nome: ${nome}
